@@ -9,6 +9,7 @@ const {
 const fetchTopLanguages = require("../src/fetchers/top-languages-fetcher");
 const renderTopLanguages = require("../src/cards/top-languages-card");
 const blacklist = require("../src/common/blacklist");
+const { isLocaleAvailable } = require("../src/translations");
 
 module.exports = async (req, res) => {
   const {
@@ -23,28 +24,41 @@ module.exports = async (req, res) => {
     theme,
     cache_seconds,
     layout,
+    langs_count,
+    exclude_repo,
+    custom_title,
+    locale,
+    border_radius,
+    border_color,
   } = req.query;
-  let topLangs;
-
   res.setHeader("Content-Type", "image/svg+xml");
 
   if (blacklist.includes(username)) {
     return res.send(renderError("Something went wrong"));
   }
 
+  if (locale && !isLocaleAvailable(locale)) {
+    return res.send(renderError("Something went wrong", "Locale not found"));
+  }
+
   try {
-    topLangs = await fetchTopLanguages(username);
+    const topLangs = await fetchTopLanguages(
+      username,
+      parseArray(exclude_repo),
+      parseArray(hide),
+    );
 
     const cacheSeconds = clampValue(
       parseInt(cache_seconds || CONSTANTS.TWO_HOURS, 10),
       CONSTANTS.TWO_HOURS,
-      CONSTANTS.ONE_DAY
+      CONSTANTS.ONE_DAY,
     );
 
     res.setHeader("Cache-Control", `public, max-age=${cacheSeconds}`);
 
     return res.send(
       renderTopLanguages(topLangs, {
+        custom_title,
         hide_title: parseBoolean(hide_title),
         hide_border: parseBoolean(hide_border),
         card_width: parseInt(card_width, 10),
@@ -54,7 +68,11 @@ module.exports = async (req, res) => {
         bg_color,
         theme,
         layout,
-      })
+        langs_count,
+        border_radius,
+        border_color,
+        locale: locale ? locale.toLowerCase() : null,
+      }),
     );
   } catch (err) {
     return res.send(renderError(err.message, err.secondaryMessage));

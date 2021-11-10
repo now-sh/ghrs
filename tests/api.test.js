@@ -35,7 +35,8 @@ const data = {
         restrictedContributionsCount: 100,
       },
       pullRequests: { totalCount: stats.totalPRs },
-      issues: { totalCount: stats.totalIssues },
+      openIssues: { totalCount: stats.totalIssues },
+      closedIssues: { totalCount: 0 },
       followers: { totalCount: 0 },
       repositories: {
         totalCount: 1,
@@ -97,8 +98,8 @@ describe("Test /api/", () => {
     expect(res.send).toBeCalledWith(
       renderError(
         error.errors[0].message,
-        "Make sure the provided username is not an organization"
-      )
+        "Make sure the provided username is not an organization",
+      ),
     );
   });
 
@@ -115,7 +116,7 @@ describe("Test /api/", () => {
         text_color: "fff",
         bg_color: "fff",
       },
-      data
+      data,
     );
 
     await api(req, res);
@@ -131,7 +132,7 @@ describe("Test /api/", () => {
         icon_color: "fff",
         text_color: "fff",
         bg_color: "fff",
-      })
+      }),
     );
   });
 
@@ -196,7 +197,7 @@ describe("Test /api/", () => {
         username: "anuraghazra",
         count_private: true,
       },
-      data
+      data,
     );
 
     await api(req, res);
@@ -217,8 +218,8 @@ describe("Test /api/", () => {
             issues: stats.totalIssues,
           }),
         },
-        {}
-      )
+        {},
+      ),
     );
   });
 });

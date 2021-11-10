@@ -3,42 +3,45 @@ const {
   renderError,
   parseBoolean,
   clampValue,
+  parseArray,
   CONSTANTS,
 } = require("../src/common/utils");
-const fetchRepo = require("../src/fetchers/repo-fetcher");
-const renderRepoCard = require("../src/cards/repo-card");
-const blacklist = require("../src/common/blacklist");
 const { isLocaleAvailable } = require("../src/translations");
+const { fetchWakatimeStats } = require("../src/fetchers/wakatime-fetcher");
+const wakatimeCard = require("../src/cards/wakatime-card");
 
 module.exports = async (req, res) => {
   const {
     username,
-    repo,
-    hide_border,
     title_color,
     icon_color,
+    hide_border,
+    line_height,
     text_color,
     bg_color,
     theme,
-    show_owner,
     cache_seconds,
+    hide_title,
+    hide_progress,
+    custom_title,
     locale,
+    layout,
+    langs_count,
+    hide,
+    api_domain,
+    range,
     border_radius,
     border_color,
   } = req.query;
 
   res.setHeader("Content-Type", "image/svg+xml");
 
-  if (blacklist.includes(username)) {
-    return res.send(renderError("Something went wrong"));
-  }
-
   if (locale && !isLocaleAvailable(locale)) {
     return res.send(renderError("Something went wrong", "Language not found"));
   }
 
   try {
-    const repoData = await fetchRepo(username, repo);
+    const stats = await fetchWakatimeStats({ username, api_domain, range });
 
     let cacheSeconds = clampValue(
       parseInt(cache_seconds || CONSTANTS.TWO_HOURS, 10),
@@ -46,33 +49,30 @@ module.exports = async (req, res) => {
       CONSTANTS.ONE_DAY,
     );
 
-    /*
-    if star count & fork count is over 1k then we are kFormating the text
-    and if both are zero we are not showing the stats
-    so we can just make the cache longer, since there is no need to frequent updates
-  */
-    const stars = repoData.starCount;
-    const forks = repoData.forkCount;
-    const isBothOver1K = stars > 1000 && forks > 1000;
-    const isBothUnder1 = stars < 1 && forks < 1;
-    if (!cache_seconds && (isBothOver1K || isBothUnder1)) {
+    if (!cache_seconds) {
       cacheSeconds = CONSTANTS.FOUR_HOURS;
     }
 
     res.setHeader("Cache-Control", `public, max-age=${cacheSeconds}`);
 
     return res.send(
-      renderRepoCard(repoData, {
+      wakatimeCard(stats, {
+        custom_title,
+        hide_title: parseBoolean(hide_title),
         hide_border: parseBoolean(hide_border),
+        hide: parseArray(hide),
+        line_height,
         title_color,
         icon_color,
         text_color,
         bg_color,
         theme,
+        hide_progress,
         border_radius,
         border_color,
-        show_owner: parseBoolean(show_owner),
         locale: locale ? locale.toLowerCase() : null,
+        layout,
+        langs_count,
       }),
     );
   } catch (err) {
