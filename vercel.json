@@ -2,7 +2,13 @@
   "functions": {
     "api/*.js": {
       "memory": 128,
-      "maxDuration": 5
+      "maxDuration": 10
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "https://ghrs.casjay.vercel.app/api/?theme=dracula&show_icons=true&username=casjay"
+    }
+  ]
 }
