@@ -8,7 +8,7 @@
   "redirects": [
     {
       "source": "/",
-      "destination": "https://github.com/anuraghazra/github-readme-stats"
+      "destination": "https://api.casjay.vercel.app/api/v1/ghrs"
     }
   ]
 }
