@@ -2,7 +2,7 @@
   "name": "github-readme-stats",
   "version": "1.0.0",
   "description": "Dynamically generate stats for your github readmes",
-  "main": "index.js",
+  "main": "api/index.js",
   "scripts": {
     "test": "jest --coverage",
     "test:watch": "jest --watch",
