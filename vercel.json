@@ -1,6 +1,7 @@
 {
   "functions": {
     "api/*.js": {
+      "includeFiles": "**"
     }
   },
   "redirects": [
