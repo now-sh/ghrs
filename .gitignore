@@ -11,3 +11,5 @@ package-lock.json
 coverage
 vercel_token
 
+# ignore commit message
+.gitcommit
