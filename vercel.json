@@ -7,7 +7,7 @@
   "redirects": [
     {
       "source": "/",
-      "destination": "https://ghrs.casjay.vercel.app/api/?theme=dracula&show_icons=true&username=casjay"
+      "destination": "https://ghrs.casjay.coffee/api/?theme=dracula&show_icons=true&username=casjay"
     }
   ]
 }
